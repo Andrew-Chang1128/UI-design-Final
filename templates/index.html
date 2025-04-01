@@ -19,6 +19,11 @@
                 <div id="regex-validation" class="validation-message"></div>
             </div>
             
+            <div class="regex-container">
+                <h3>Regex Explanation (hover over components)</h3>
+                <div id="regex-display" class="regex-display-area"></div>
+            </div>
+            
             <div class="flags-container">
                 <span>Flags:</span>
                 <label><input type="checkbox" id="flag-g" checked> g (global)</label>
@@ -40,6 +45,9 @@
             </div>
         </div>
     </div>
+    
+    <!-- Tooltip container that will be positioned absolutely -->
+    <div id="tooltip-container"></div>
     
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
