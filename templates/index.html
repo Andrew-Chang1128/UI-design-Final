@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Regex Playground</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Python Regex Playground</h1>
+    </header>
+    
+    <div class="container">
+        <div class="regex-section">
+            <div class="input-container">
+                <label for="regex-input">Regular Expression</label>
+                <input type="text" id="regex-input" placeholder="Enter your regex pattern">
+                <div id="regex-validation" class="validation-message"></div>
+            </div>
+            
+            <div class="flags-container">
+                <span>Flags:</span>
+                <label><input type="checkbox" id="flag-g" checked> g (global)</label>
+                <label><input type="checkbox" id="flag-i"> i (case insensitive)</label>
+                <label><input type="checkbox" id="flag-m"> m (multiline)</label>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <label for="test-input">Test Text</label>
+            <textarea id="test-input" placeholder="Enter text to test your regex"></textarea>
+            <div id="results-container" class="results">
+                <div id="highlighted-text"></div>
+                <div id="matches-count">0 matches</div>
+            </div>
+            <div class="matches-section">
+                <h3>Matched Elements:</h3>
+                <div id="matched-elements" class="matched-elements-list"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html> 
