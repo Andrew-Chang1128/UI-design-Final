@@ -1,9 +1,12 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, session
 import re
 import html
 import json
+import os
+from datetime import datetime
 
 app = Flask(__name__)
+app.secret_key = 'regex_learning_app_secret_key'  # Required for session
 
 # Regex component explanations
 REGEX_EXPLANATIONS = {
@@ -45,9 +48,235 @@ REGEX_EXPLANATIONS = {
     r'(?<!...)': 'Negative lookbehind. Matches if not preceded by ...',
 }
 
+# Learning content in JSON format
+LESSONS = [
+    {
+        "id": 1,
+        "title": "What is Regex?",
+        "content": "Regular expressions (regex) are patterns used to match character combinations in strings. In this tutorial, you'll learn how to use regular expressions to match and extract data.",
+        "example_pattern": "cat",
+        "example_text": "The cat sat on the catalogue.",
+        "explanation": "The pattern 'cat' matches the first 'cat' in 'The cat sat on the catalogue' and also the first part of 'catalogue'."
+    },
+    {
+        "id": 2,
+        "title": "Character Classes",
+        "content": "Character classes allow you to match any character from a specific set.",
+        "example_pattern": "[a-z]",
+        "example_text": "Hello123",
+        "explanation": "The pattern [a-z] matches any lowercase letter in 'Hello123', which are 'e', 'l', 'l', and 'o'."
+    },
+    {
+        "id": 3,
+        "title": "Quantifiers",
+        "content": "Quantifiers specify how many instances of a character, group, or character class must be present for a match to be found.",
+        "example_pattern": "ha*",
+        "example_text": "haaaa!",
+        "explanation": "The pattern 'ha*' matches 'h' followed by zero or more 'a' characters. In 'haaaa!', it matches 'haaaa'."
+    },
+    {
+        "id": 4,
+        "title": "Anchors",
+        "content": "Anchors match positions rather than characters. They include start of line (^) and end of line ($).",
+        "example_pattern": "^Hello",
+        "example_text": "Hello World\nHello again",
+        "explanation": "The pattern '^Hello' matches 'Hello' only at the start of a line. In our multiline text, it matches the first 'Hello' and the 'Hello' after the newline."
+    },
+    {
+        "id": 5,
+        "title": "Groups & Ranges",
+        "content": "Groups allow you to apply quantifiers to entire patterns. Ranges within character classes let you specify a range of characters.",
+        "example_pattern": "([A-Z]\\w+)",
+        "example_text": "The Quick Brown Fox Jumps",
+        "explanation": "The pattern '([A-Z]\\w+)' matches words that start with a capital letter followed by one or more word characters."
+    },
+    {
+        "id": 6,
+        "title": "Regex Flags",
+        "content": "Flags change how the matching behaves. Common flags include 'g' (global), 'i' (case-insensitive), and 'm' (multiline).",
+        "example_pattern": "test",
+        "example_text": "Test this test and this test again.",
+        "explanation": "With the 'g' flag, the pattern 'test' will match all occurrences of 'test'. With 'i' flag, it will match 'Test' as well."
+    }
+]
+
+# Quiz questions in JSON format
+QUIZ_QUESTIONS = [
+    {
+        "id": 1,
+        "question": "Which regex pattern matches all capitalized words?",
+        "text": "The Quick Brown Fox Jumps",
+        "options": [
+            {"id": "a", "pattern": "[A-Z]\\w+"},
+            {"id": "b", "pattern": "\\b[A-Z][a-z]*\\b"},
+            {"id": "c", "pattern": "[A-Z][a-z]+"}
+        ],
+        "correct_answer": "b",
+        "explanation": "\\b[A-Z][a-z]*\\b matches words that begin with a capital letter followed by zero or more lowercase letters, with word boundaries on both sides."
+    },
+    {
+        "id": 2,
+        "question": "Which regex pattern matches all digits in the text?",
+        "text": "Room 404, Floor 2",
+        "options": [
+            {"id": "a", "pattern": "[0-9]"},
+            {"id": "b", "pattern": "\\d"},
+            {"id": "c", "pattern": "\\d+"}
+        ],
+        "correct_answer": "c",
+        "explanation": "\\d+ matches one or more consecutive digits, which captures '404' and '2'."
+    },
+    {
+        "id": 3,
+        "question": "Which regex pattern matches valid email addresses?",
+        "text": "Contact us at example@email.com or support@company.org",
+        "options": [
+            {"id": "a", "pattern": "\\w+@\\w+\\.\\w+"},
+            {"id": "b", "pattern": "[a-z]+@[a-z]+\\.[a-z]+"},
+            {"id": "c", "pattern": ".*@.*\\..*"}
+        ],
+        "correct_answer": "a",
+        "explanation": "\\w+@\\w+\\.\\w+ matches one or more word characters, followed by @, more word characters, a period, and finally more word characters."
+    },
+    {
+        "id": 4,
+        "question": "Which regex pattern matches lines that start with 'Error:'?",
+        "text": "Error: File not found\nWarning: Low battery\nError: Connection lost",
+        "options": [
+            {"id": "a", "pattern": "Error:"},
+            {"id": "b", "pattern": "^Error:"},
+            {"id": "c", "pattern": "Error:.*"}
+        ],
+        "correct_answer": "b",
+        "explanation": "^Error: uses the ^ anchor to match 'Error:' only at the beginning of a line."
+    }
+]
+
+# Initialize user session data
+def init_user_session():
+    if 'user_data' not in session:
+        session['user_data'] = {
+            'start_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+            'lessons_viewed': [],
+            'quiz_answers': {},
+            'score': 0
+        }
+
 @app.route('/')
 def index():
+    # Reset user session data when accessing home page
+    session.pop('user_data', None)
     return render_template('index.html')
+
+@app.route('/learn/<int:lesson_id>')
+def learn(lesson_id):
+    init_user_session()
+    
+    # Record lesson access in user session
+    if 'lessons_viewed' in session['user_data'] and lesson_id not in session['user_data']['lessons_viewed']:
+        session['user_data']['lessons_viewed'].append(lesson_id)
+        session.modified = True
+    
+    # Find the requested lesson
+    if 1 <= lesson_id <= len(LESSONS):
+        lesson = LESSONS[lesson_id-1]
+        next_id = lesson_id + 1 if lesson_id < len(LESSONS) else None
+        
+        return render_template('learn.html', 
+                              lesson=lesson, 
+                              next_id=next_id, 
+                              has_next=lesson_id < len(LESSONS),
+                              total_lessons=len(LESSONS))
+    else:
+        return "Lesson not found", 404
+
+@app.route('/quiz/<int:question_id>', methods=['GET', 'POST'])
+def quiz(question_id):
+    init_user_session()
+    
+    # Reset score and answers when starting a new quiz
+    if question_id == 1 and request.method == 'GET':
+        session['user_data']['score'] = 0
+        session['user_data']['quiz_answers'] = {}
+        session.modified = True
+        print(f"Reset quiz: score={session['user_data']['score']}, answers={session['user_data']['quiz_answers']}")
+    
+    if request.method == 'POST':
+        # Save the previous question answer
+        prev_id = request.form.get('prev_question_id')
+        if prev_id:
+            prev_id = int(prev_id)
+            selected_answer = request.form.get('answer')
+            # Convert prev_id to string when using as dictionary key
+            session['user_data']['quiz_answers'][str(prev_id)] = selected_answer
+            
+            # Check if answer is correct and update score
+            if prev_id <= len(QUIZ_QUESTIONS):
+                correct_answer = QUIZ_QUESTIONS[prev_id-1]['correct_answer']
+                if selected_answer == correct_answer:
+                    session['user_data']['score'] += 1
+                    print(f"Correct answer for question {prev_id}! New score: {session['user_data']['score']}")
+                else:
+                    print(f"Wrong answer for question {prev_id}. Selected: {selected_answer}, Correct: {correct_answer}")
+            
+            session.modified = True
+            print(f"Updated quiz data: score={session['user_data']['score']}, answers={session['user_data']['quiz_answers']}")
+    
+    # Find the requested question
+    if 1 <= question_id <= len(QUIZ_QUESTIONS):
+        question = QUIZ_QUESTIONS[question_id-1]
+        next_id = question_id + 1 if question_id < len(QUIZ_QUESTIONS) else None
+        
+        # Get previously selected answer, if any
+        selected_answer = session['user_data']['quiz_answers'].get(str(question_id), None)
+        
+        return render_template('quiz.html', 
+                              question=question, 
+                              next_id=next_id, 
+                              has_next=question_id < len(QUIZ_QUESTIONS),
+                              selected_answer=selected_answer,
+                              total_questions=len(QUIZ_QUESTIONS))
+    else:
+        return "Question not found", 404
+
+@app.route('/results')
+def results():
+    init_user_session()
+    
+    score = session['user_data']['score']
+    total = len(QUIZ_QUESTIONS)
+    percentage = (score / total) * 100 if total > 0 else 0
+    
+    print(f"Results page: score={score}, total={total}, answers={session['user_data']['quiz_answers']}")
+    
+    user_answers = {}
+    for q_id_str, answer in session['user_data']['quiz_answers'].items():
+        q_id = int(q_id_str)  # Convert the string key back to integer
+        if 1 <= q_id <= len(QUIZ_QUESTIONS):
+            question = QUIZ_QUESTIONS[q_id-1]
+            is_correct = answer == question['correct_answer']
+            
+            # Find the selected option text
+            selected_option = next((opt for opt in question['options'] if opt['id'] == answer), None)
+            correct_option = next((opt for opt in question['options'] if opt['id'] == question['correct_answer']), None)
+            
+            user_answers[q_id_str] = {
+                'question': question['question'],
+                'selected': selected_option['pattern'] if selected_option else "No answer",
+                'correct': correct_option['pattern'],
+                'is_correct': is_correct,
+                'explanation': question['explanation']
+            }
+    
+    return render_template('results.html', 
+                          score=score, 
+                          total=total, 
+                          percentage=percentage,
+                          user_answers=user_answers)
+
+@app.route('/playground')
+def playground():
+    return render_template('playground.html')
 
 @app.route('/api/regex', methods=['POST'])
 def process_regex():

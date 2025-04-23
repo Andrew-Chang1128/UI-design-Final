@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Regex Quiz - Question {{ question.id }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <header class="bg-primary text-white py-3">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1>Regex Quiz</h1>
+                <a href="{{ url_for('index') }}" class="btn btn-outline-light">Home</a>
+            </div>
+        </div>
+    </header>
+    
+    <div class="container my-5">
+        <div class="progress mb-4">
+            <div class="progress-bar bg-success" role="progressbar" style="width: {{ (question.id / total_questions * 100)|int }}%;" 
+                 aria-valuenow="{{ question.id }}" aria-valuemin="0" aria-valuemax="{{ total_questions }}">
+                Question {{ question.id }} of {{ total_questions }}
+            </div>
+        </div>
+        
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-light">
+                <h2>Question {{ question.id }}</h2>
+            </div>
+            <div class="card-body">
+                <h5 class="card-title mb-4">{{ question.question }}</h5>
+                
+                <div class="example-section p-3 bg-light rounded mb-4">
+                    <h6>Test Text:</h6>
+                    <pre class="border p-3 bg-white">{{ question.text }}</pre>
+                </div>
+                
+                <form action="{{ url_for('quiz', question_id=next_id if has_next else 1) }}" method="post" id="quiz-form">
+                    <input type="hidden" name="prev_question_id" value="{{ question.id }}">
+                    
+                    <div class="options-container mb-4">
+                        <h6>Select the correct regex pattern:</h6>
+                        
+                        {% for option in question.options %}
+                        <div class="form-check mb-3 p-3 border rounded {% if selected_answer == option.id %}bg-light{% endif %}">
+                            <input class="form-check-input" type="radio" name="answer" id="option-{{ option.id }}" 
+                                   value="{{ option.id }}" {% if selected_answer == option.id %}checked{% endif %} required>
+                            <label class="form-check-label w-100" for="option-{{ option.id }}">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <span class="option-label">{{ option.id | upper }}.</span>
+                                    <code class="ms-3 py-1 px-2 bg-dark text-white rounded">{{ option.pattern }}</code>
+                                </div>
+                                <div class="mt-2 result-preview" id="result-{{ option.id }}"></div>
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        {% if question.id > 1 %}
+                            <a href="{{ url_for('quiz', question_id=question.id-1) }}" class="btn btn-outline-secondary">Previous Question</a>
+                        {% else %}
+                            <a href="{{ url_for('learn', lesson_id=6) }}" class="btn btn-outline-secondary">Back to Lessons</a>
+                        {% endif %}
+                        
+                        {% if has_next %}
+                            <button type="submit" class="btn btn-primary">Next Question</button>
+                        {% else %}
+                            <button type="submit" class="btn btn-success">Finish Quiz</button>
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <footer class="mt-5 py-3 bg-light text-center">
+        <div class="container">
+            <p class="text-muted">Regular Expressions Learning Platform © 2023</p>
+        </div>
+    </footer>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const testText = `{{ question.text }}`;
+            const options = [
+                {% for option in question.options %}
+                {
+                    id: "{{ option.id }}",
+                    pattern: "{{ option.pattern }}"
+                },
+                {% endfor %}
+            ];
+            
+            options.forEach(option => {
+                const resultElement = document.getElementById(`result-${option.id}`);
+                
+                try {
+                    // Create regex object - replace double backslashes with single backslashes for JS
+                    const pattern = option.pattern.replace(/\\\\([dws])/g, '\\$1');
+                    const regex = new RegExp(pattern, 'g');
+                    
+                    // Find matches
+                    let match;
+                    let highlightedText = testText;
+                    let matches = [];
+                    
+                    while ((match = regex.exec(testText)) !== null) {
+                        matches.push({
+                            text: match[0],
+                            index: match.index,
+                            length: match[0].length
+                        });
+                    }
+                    
+                    // Sort matches by index (from end to start to avoid position shifts)
+                    matches.sort((a, b) => b.index - a.index);
+                    
+                    // Apply highlighting
+                    matches.forEach(match => {
+                        const before = highlightedText.substring(0, match.index);
+                        const highlighted = `<span class="highlight">${highlightedText.substring(match.index, match.index + match.length)}</span>`;
+                        const after = highlightedText.substring(match.index + match.length);
+                        highlightedText = before + highlighted + after;
+                    });
+                    
+                    resultElement.innerHTML = `<small>Matches: ${matches.length}</small><br>
+                                              <small class="preview-text">${highlightedText || '<em>No matches found</em>'}</small>`;
+                    
+                } catch (e) {
+                    resultElement.innerHTML = `<small class="text-danger">Error: ${e.message}</small>`;
+                }
+            });
+            
+            // If this is the last question and form is submitted, redirect to results
+            const form = document.getElementById('quiz-form');
+            
+            {% if not has_next %}
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Create FormData object to get form data
+                const formData = new FormData(form);
+                
+                // Send form data using fetch API
+                fetch(form.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => {
+                    // After successful submission, redirect to results page
+                    window.location.href = "{{ url_for('results') }}";
+                })
+                .catch(error => {
+                    console.error('Error submitting answer:', error);
+                    // Still redirect to results even if there's an error
+                    window.location.href = "{{ url_for('results') }}";
+                });
+            });
+            {% endif %}
+        });
+    </script>
+</body>
+</html> 

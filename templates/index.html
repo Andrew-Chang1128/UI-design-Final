@@ -3,52 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Python Regex Playground</title>
+    <title>Learning Regular Expressions</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <header>
-        <h1>Python Regex Playground</h1>
+    <header class="bg-primary text-white py-4 mb-5">
+        <div class="container text-center">
+            <h1>Learning Regular Expressions</h1>
+            <p class="lead">An Interactive Tutorial and Playground</p>
+        </div>
     </header>
     
     <div class="container">
-        <div class="regex-section">
-            <div class="input-container">
-                <label for="regex-input">Regular Expression</label>
-                <input type="text" id="regex-input" placeholder="Enter your regex pattern">
-                <div id="regex-validation" class="validation-message"></div>
-            </div>
-            
-            <div class="regex-container">
-                <h3>Regex Explanation (hover over components)</h3>
-                <div id="regex-display" class="regex-display-area"></div>
-            </div>
-            
-            <div class="flags-container">
-                <span>Flags:</span>
-                <label><input type="checkbox" id="flag-g" checked> g (global)</label>
-                <label><input type="checkbox" id="flag-i"> i (case insensitive)</label>
-                <label><input type="checkbox" id="flag-m"> m (multiline)</label>
-            </div>
-        </div>
-        
-        <div class="test-section">
-            <label for="test-input">Test Text</label>
-            <textarea id="test-input" placeholder="Enter text to test your regex"></textarea>
-            <div id="results-container" class="results">
-                <div id="highlighted-text"></div>
-                <div id="matches-count">0 matches</div>
-            </div>
-            <div class="matches-section">
-                <h3>Matched Elements:</h3>
-                <div id="matched-elements" class="matched-elements-list"></div>
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow-sm">
+                    <div class="card-body text-center p-5">
+                        <h2 class="mb-4">Welcome to Regex Learning</h2>
+                        <p class="mb-4">Regular expressions (regex) are powerful tools for matching patterns in text. They can be intimidating at first, but with practice, you'll find them incredibly useful for text processing tasks.</p>
+                        
+                        <div class="mb-4">
+                            <h5>In this tutorial, you'll learn:</h5>
+                            <ul class="list-group list-group-flush text-start">
+                                <li class="list-group-item">Basic regex syntax and patterns</li>
+                                <li class="list-group-item">How to use character classes and quantifiers</li>
+                                <li class="list-group-item">Working with groups and special characters</li>
+                                <li class="list-group-item">How to apply regex for real-world problems</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <a href="{{ url_for('learn', lesson_id=1) }}" class="btn btn-primary btn-lg">Start Learning</a>
+                            <a href="{{ url_for('playground') }}" class="btn btn-outline-secondary">Try Regex Playground</a>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+
+    <footer class="mt-5 py-3 bg-light text-center">
+        <div class="container">
+            <p class="text-muted">Regular Expressions Learning Platform © 2023</p>
+        </div>
+    </footer>
     
-    <!-- Tooltip container that will be positioned absolutely -->
-    <div id="tooltip-container"></div>
-    
-    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html> 
