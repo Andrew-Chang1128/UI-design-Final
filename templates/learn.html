@@ -38,83 +38,64 @@
                         <label class="form-label">Pattern:</label>
                         <div class="input-group">
                             <span class="input-group-text">/</span>
-                            <input type="text" class="form-control" id="pattern-input" value="{{ lesson.example_pattern }}" readonly>
-                            <span class="input-group-text">/{% if lesson.id == 4 %}gm{% else %}g{% endif %}</span>
+                            <input type="text" class="form-control" id="pattern-input" value="{{ lesson.example_pattern }}">
+                            <span class="input-group-text">/</span>
                         </div>
+                    </div>
+                    
+                    <div class="flags-container mb-3">
+                        <span class="me-2">Flags:</span>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="flag-g" checked>
+                            <label class="form-check-label" for="flag-g">g (global)</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="flag-i">
+                            <label class="form-check-label" for="flag-i">i (case insensitive)</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="flag-m" {% if lesson.id == 4 %}checked{% endif %}>
+                            <label class="form-check-label" for="flag-m">m (multiline)</label>
+                        </div>
+                        <div id="regex-validation" class="validation-message mt-1"></div>
                     </div>
                     
                     <div class="mb-3">
                         <label class="form-label">Test Text:</label>
-                        <textarea class="form-control" id="test-text" rows="3" readonly>{{ lesson.example_text }}</textarea>
+                        <div class="input-container">
+                            <div class="persistent-placeholder">{{ lesson.example_text }}</div>
+                            <textarea class="form-control transparent-input" id="test-text" rows="4"></textarea>
+                        </div>
+                        <small class="text-muted">Type your own text to test the pattern. The example shows through as a guide.</small>
                     </div>
                     
-                    <div class="result-container p-3 border rounded mb-3">
-                        <h6>Matches:</h6>
-                        <div id="result-display"></div>
+                    <div class="row">
+                        <div class="col-md-7">
+                            <div class="result-container p-3 border rounded mb-3 position-relative">
+                                <h6>Matches:</h6>
+                                <div id="result-display"></div>
+                                <div id="matches-count" class="badge bg-secondary position-absolute top-0 end-0 m-2">0 matches</div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-5">
+                            <div class="matches-section">
+                                <h6>Matched Elements:</h6>
+                                <div id="matched-elements" class="matched-elements-list"></div>
+                            </div>
+                        </div>
                     </div>
                     
                     <div class="explanation border-top pt-3">
                         <p><strong>Explanation:</strong> {{ lesson.explanation }}</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Interactive Playground Section -->
-        <div class="card shadow-sm mb-4">
-            <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                <h3>Try It Yourself</h3>
-                <a href="{{ url_for('playground') }}" class="btn btn-outline-primary btn-sm">Open Full Playground</a>
-            </div>
-            <div class="card-body">
-                <p class="mb-3">Experiment with patterns related to this lesson and see the results in real-time.</p>
-                
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="input-container mb-3">
-                            <label for="practice-regex-input" class="form-label">Pattern:</label>
-                            <input type="text" id="practice-regex-input" class="form-control" value="{{ lesson.example_pattern }}">
-                            <div id="practice-regex-validation" class="validation-message mt-2"></div>
-                        </div>
-                        
-                        <div class="flags-container mb-3">
-                            <span class="me-2">Flags:</span>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="checkbox" id="practice-flag-g" checked>
-                                <label class="form-check-label" for="practice-flag-g">g (global)</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="checkbox" id="practice-flag-i">
-                                <label class="form-check-label" for="practice-flag-i">i (case insensitive)</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="checkbox" id="practice-flag-m" {% if lesson.id == 4 %}checked{% endif %}>
-                                <label class="form-check-label" for="practice-flag-m">m (multiline)</label>
-                            </div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="practice-test-input" class="form-label">Test Text:</label>
-                            <textarea id="practice-test-input" class="form-control" rows="5">{{ lesson.example_text }}</textarea>
+                        <div class="alert alert-info mt-2">
+                            <small><i class="fas fa-info-circle"></i> Try modifying the pattern or test text to see how it affects the matches. Experiment with different flags to understand their effects.</small>
                         </div>
                     </div>
                     
-                    <div class="col-md-6">
-                        <div class="result-container p-3 border rounded mb-3 position-relative">
-                            <h6>Matches:</h6>
-                            <div id="practice-highlighted-text"></div>
-                            <div id="practice-matches-count" class="badge bg-secondary position-absolute top-0 end-0 m-2">0 matches</div>
-                        </div>
-                        
-                        <div class="matches-section">
-                            <h6>Matched Elements:</h6>
-                            <div id="practice-matched-elements" class="matched-elements-list"></div>
-                        </div>
+                    <div class="text-end">
+                        <a href="{{ url_for('playground') }}" class="btn btn-outline-primary btn-sm">Open Full Playground</a>
                     </div>
-                </div>
-                
-                <div class="mt-4">
-                    <p class="text-muted small">Tip: Try modifying the pattern to see how it affects the matches.</p>
                 </div>
             </div>
         </div>
@@ -170,84 +151,62 @@
         }
         
         document.addEventListener('DOMContentLoaded', function() {
-            // 1. Example visualization (read-only example)
-            const pattern = document.getElementById('pattern-input').value;
-            const testText = document.getElementById('test-text').value;
+            // Get DOM elements
+            const patternInput = document.getElementById('pattern-input');
+            const testText = document.getElementById('test-text');
             const resultDisplay = document.getElementById('result-display');
-            
-            try {
-                // Create regex object
-                let flags = 'g';
-                
-                // Add multiline flag for the anchors lesson to properly match line beginnings and endings
-                if ("{{ lesson.id }}" == "4") {
-                    flags += 'm';
-                }
-                
-                const regex = new RegExp(pattern, flags);
-                
-                // Find matches
-                let match;
-                let highlightedText = testText;
-                let matches = [];
-                
-                while ((match = regex.exec(testText)) !== null) {
-                    matches.push({
-                        text: match[0],
-                        index: match.index,
-                        length: match[0].length
-                    });
-                }
-                
-                // Sort matches by index (from end to start to avoid position shifts)
-                matches.sort((a, b) => b.index - a.index);
-                
-                // Apply highlighting
-                matches.forEach(match => {
-                    const before = highlightedText.substring(0, match.index);
-                    const highlighted = `<span class="highlight">${highlightedText.substring(match.index, match.index + match.length)}</span>`;
-                    const after = highlightedText.substring(match.index + match.length);
-                    highlightedText = before + highlighted + after;
-                });
-                
-                resultDisplay.innerHTML = highlightedText || '<em>No matches found</em>';
-                
-            } catch (e) {
-                resultDisplay.innerHTML = `<p class="text-danger">Error: ${e.message}</p>`;
-            }
-            
-            // 2. Interactive playground functionality
-            const practiceRegexInput = document.getElementById('practice-regex-input');
-            const practiceTestInput = document.getElementById('practice-test-input');
-            const practiceHighlightedText = document.getElementById('practice-highlighted-text');
-            const practiceMatchesCount = document.getElementById('practice-matches-count');
-            const practiceValidationMessage = document.getElementById('practice-regex-validation');
-            const practiceMatchedElements = document.getElementById('practice-matched-elements');
+            const matchesCount = document.getElementById('matches-count');
+            const validationMessage = document.getElementById('regex-validation');
+            const matchedElements = document.getElementById('matched-elements');
             
             // Flag checkboxes
-            const practiceFlagG = document.getElementById('practice-flag-g');
-            const practiceFlagI = document.getElementById('practice-flag-i');
-            const practiceFlagM = document.getElementById('practice-flag-m');
+            const flagG = document.getElementById('flag-g');
+            const flagI = document.getElementById('flag-i');
+            const flagM = document.getElementById('flag-m');
             
-            // Function to process regex in the practice area
-            async function processPracticeRegex() {
-                const pattern = practiceRegexInput.value;
-                const testText = practiceTestInput.value;
+            // Initialize multiline flag for Lesson 4 (Anchors)
+            if ("{{ lesson.id }}" == "4") {
+                flagM.checked = true;
+            }
+            
+            // Handle the persistent placeholder visibility
+            testText.addEventListener('input', function() {
+                // If user entered substantial text (more than just a few characters), 
+                // make the background more opaque to hide placeholder
+                if (this.value.length > 10) {
+                    this.style.backgroundColor = 'rgba(255, 255, 255, 0.9)';
+                } else {
+                    this.style.backgroundColor = 'rgba(255, 255, 255, 0.65)';
+                }
+            });
+            
+            // Function to process regex and update the display
+            async function processRegex() {
+                const pattern = patternInput.value;
+                const text = testText.value;
                 
                 if (!pattern) {
-                    practiceHighlightedText.innerHTML = testText ? escapeHTML(testText) : '';
-                    practiceMatchesCount.textContent = '0 matches';
-                    practiceValidationMessage.textContent = '';
-                    practiceValidationMessage.className = 'validation-message';
-                    practiceMatchedElements.innerHTML = '';
+                    resultDisplay.innerHTML = text ? escapeHTML(text) : '';
+                    matchesCount.textContent = '0 matches';
+                    validationMessage.textContent = '';
+                    validationMessage.className = 'validation-message';
+                    matchedElements.innerHTML = '';
+                    return;
+                }
+                
+                // Handle empty test text
+                if (!text) {
+                    resultDisplay.innerHTML = '<div class="text-muted fst-italic">Type some text in the Test Text field to see matches.</div>';
+                    matchesCount.textContent = '0 matches';
+                    matchedElements.innerHTML = '<div class="no-matches">No text to match against</div>';
                     return;
                 }
                 
                 // Build flags string
                 let flags = '';
-                if (practiceFlagG.checked) flags += 'g';
-                if (practiceFlagI.checked) flags += 'i';
-                if (practiceFlagM.checked) flags += 'm';
+                if (flagG.checked) flags += 'g';
+                if (flagI.checked) flags += 'i';
+                if (flagM.checked) flags += 'm';
                 
                 try {
                     const response = await fetch('/api/regex', {
@@ -257,7 +216,7 @@
                         },
                         body: JSON.stringify({
                             pattern: pattern,
-                            text: testText || '', // Handle empty test text
+                            text: text || '', // Handle empty test text
                             flags: flags
                         }),
                     });
@@ -269,50 +228,55 @@
                     const data = await response.json();
                     
                     if (data.valid) {
-                        practiceHighlightedText.innerHTML = data.highlighted_html;
-                        practiceMatchesCount.textContent = `${data.count} ${data.count === 1 ? 'match' : 'matches'}`;
-                        practiceValidationMessage.textContent = 'Valid regex pattern';
-                        practiceValidationMessage.className = 'validation-message success';
+                        resultDisplay.innerHTML = data.highlighted_html;
+                        matchesCount.textContent = `${data.count} ${data.count === 1 ? 'match' : 'matches'}`;
+                        validationMessage.textContent = 'Valid regex pattern';
+                        validationMessage.className = 'validation-message success';
                         
                         // Display matched elements
-                        practiceMatchedElements.innerHTML = '';
+                        matchedElements.innerHTML = '';
                         if (data.match_details && data.match_details.length > 0) {
                             data.match_details.forEach((match, index) => {
                                 const matchElement = document.createElement('div');
                                 matchElement.className = 'matched-element';
                                 matchElement.innerHTML = `<span class="match-num">${index + 1}:</span> <code>${match}</code>`;
-                                practiceMatchedElements.appendChild(matchElement);
+                                matchedElements.appendChild(matchElement);
                             });
                         } else {
-                            practiceMatchedElements.innerHTML = '<div class="no-matches">No matches found</div>';
+                            matchedElements.innerHTML = '<div class="no-matches">No matches found</div>';
                         }
                     } else {
-                        practiceHighlightedText.innerHTML = data.highlighted_html;
-                        practiceMatchesCount.textContent = '0 matches';
-                        practiceValidationMessage.textContent = `Invalid regex: ${data.error}`;
-                        practiceValidationMessage.className = 'validation-message error';
-                        practiceMatchedElements.innerHTML = '';
+                        resultDisplay.innerHTML = data.highlighted_html;
+                        matchesCount.textContent = '0 matches';
+                        validationMessage.textContent = `Invalid regex: ${data.error}`;
+                        validationMessage.className = 'validation-message error';
+                        matchedElements.innerHTML = '';
                     }
                 } catch (error) {
                     console.error('Error:', error);
-                    practiceValidationMessage.textContent = `Error: ${error.message}`;
-                    practiceValidationMessage.className = 'validation-message error';
-                    practiceMatchedElements.innerHTML = '';
+                    validationMessage.textContent = `Error: ${error.message}`;
+                    validationMessage.className = 'validation-message error';
+                    matchedElements.innerHTML = '';
                 }
             }
             
-            // Debounced version to prevent too many API calls
-            const debouncedProcessPracticeRegex = debounce(processPracticeRegex, 300);
+            // Create a debounced version of the process function
+            const debouncedProcessRegex = debounce(processRegex, 300);
             
-            // Add event listeners for the practice area
-            practiceRegexInput.addEventListener('input', debouncedProcessPracticeRegex);
-            practiceTestInput.addEventListener('input', debouncedProcessPracticeRegex);
-            practiceFlagG.addEventListener('change', debouncedProcessPracticeRegex);
-            practiceFlagI.addEventListener('change', debouncedProcessPracticeRegex);
-            practiceFlagM.addEventListener('change', debouncedProcessPracticeRegex);
+            // Add event listeners
+            patternInput.addEventListener('input', debouncedProcessRegex);
+            testText.addEventListener('input', debouncedProcessRegex);
+            flagG.addEventListener('change', debouncedProcessRegex);
+            flagI.addEventListener('change', debouncedProcessRegex);
+            flagM.addEventListener('change', debouncedProcessRegex);
             
-            // Initial call for the practice area
-            processPracticeRegex();
+            // Show initial guidance message
+            resultDisplay.innerHTML = '<div class="text-muted fst-italic">Type in the Test Text field to see how the pattern matches.</div>';
+            matchesCount.textContent = '0 matches';
+            matchedElements.innerHTML = '<div class="alert alert-info">Start typing in the Test Text area. The example text remains visible as a guide. You can type over it or create your own text.</div>';
+            
+            // Initial processing
+            processRegex();
         });
     </script>
 </body>
