@@ -342,13 +342,53 @@ code {
 }
 
 /* Additional styles for highlights in learning examples */
-#result-display .highlight {
+#result-display .highlight, #practice-highlighted-text .highlight {
     background-color: rgba(246, 173, 85, 0.3);
     border: 1px solid rgba(246, 173, 85, 0.6);
     padding: 2px 4px;
     margin: 0 1px;
     border-radius: 3px;
     color: #d35400;
+}
+
+/* Lesson page interactive playground styles */
+.try-it-yourself-section {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
+
+#practice-regex-validation {
+    font-size: 0.875rem;
+    margin: 0.5rem 0;
+    min-height: 1.25rem;
+}
+
+#practice-regex-validation.success {
+    color: #38a169;
+}
+
+#practice-regex-validation.error {
+    color: #e53e3e;
+}
+
+#practice-highlighted-text {
+    font-family: monospace;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+#practice-matches-count {
+    font-size: 0.75rem;
+}
+
+#practice-matched-elements {
+    font-family: monospace;
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    padding: 0.75rem;
+    max-height: 200px;
+    overflow-y: auto;
 }
 
 /* Responsive adjustments */
