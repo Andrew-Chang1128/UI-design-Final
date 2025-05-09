@@ -39,7 +39,7 @@
                         <div class="input-group">
                             <span class="input-group-text">/</span>
                             <input type="text" class="form-control" id="pattern-input" value="{{ lesson.example_pattern }}" readonly>
-                            <span class="input-group-text">/g</span>
+                            <span class="input-group-text">/{% if lesson.id == 4 %}gm{% else %}g{% endif %}</span>
                         </div>
                     </div>
                     
@@ -91,7 +91,14 @@
             
             try {
                 // Create regex object
-                const regex = new RegExp(pattern, 'g');
+                let flags = 'g';
+                
+                // Add multiline flag for the anchors lesson to properly match line beginnings and endings
+                if ("{{ lesson.id }}" == "4") {
+                    flags += 'm';
+                }
+                
+                const regex = new RegExp(pattern, flags);
                 
                 // Find matches
                 let match;

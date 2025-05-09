@@ -80,7 +80,7 @@ LESSONS = [
         "content": "Anchors match positions rather than characters. They include start of line (^) and end of line ($).",
         "example_pattern": "^Hello",
         "example_text": "Hello World\nHello again",
-        "explanation": "The pattern '^Hello' matches 'Hello' only at the start of a line. In our multiline text, it matches the first 'Hello' and the 'Hello' after the newline."
+        "explanation": "The pattern '^Hello' matches 'Hello' only at the start of a line. With the multiline flag (m), it matches both 'Hello's in our text - the first one at the beginning of the entire string and the second one at the beginning of a new line after the newline character."
     },
     {
         "id": 5,
@@ -104,51 +104,51 @@ LESSONS = [
 QUIZ_QUESTIONS = [
     {
         "id": 1,
-        "question": "Which regex pattern matches all capitalized words?",
-        "text": "The Quick Brown Fox Jumps",
+        "question": "Which regex pattern matches ONLY the uppercase letters?",
+        "text": "Hello WORLD 123",
         "options": [
-            {"id": "a", "pattern": "[A-Z]\\w+"},
-            {"id": "b", "pattern": "\\b[A-Z][a-z]*\\b"},
-            {"id": "c", "pattern": "[A-Z][a-z]+"}
+            {"id": "a", "pattern": "[A-Z]", "hint": "Matches any single uppercase letter from A to Z"},
+            {"id": "b", "pattern": "\\w", "hint": "Matches any word character (letters, numbers, underscore)"},
+            {"id": "c", "pattern": "[^a-z0-9]", "hint": "Matches any character that is NOT a lowercase letter or digit"}
         ],
-        "correct_answer": "b",
-        "explanation": "\\b[A-Z][a-z]*\\b matches words that begin with a capital letter followed by zero or more lowercase letters, with word boundaries on both sides."
+        "correct_answer": "a",
+        "explanation": "[A-Z] matches only uppercase letters. Pattern B (\\w) would match all letters and numbers, while pattern C ([^a-z0-9]) would match uppercase letters but also other special characters."
     },
     {
         "id": 2,
-        "question": "Which regex pattern matches all digits in the text?",
-        "text": "Room 404, Floor 2",
+        "question": "Which regex pattern matches ONLY the complete multi-digit numbers in the text?",
+        "text": "Room 404, Floor 2, Dimension 5x7, Code 9",
         "options": [
-            {"id": "a", "pattern": "[0-9]"},
-            {"id": "b", "pattern": "\\d"},
-            {"id": "c", "pattern": "\\d+"}
+            {"id": "a", "pattern": "\\d+", "hint": "Matches one or more consecutive digits"},
+            {"id": "b", "pattern": "\\b\\d{2,}\\b", "hint": "Matches two or more digits that form a complete word"},
+            {"id": "c", "pattern": "\\b\\d\\b", "hint": "Matches single digits that form a complete word"}
         ],
-        "correct_answer": "c",
-        "explanation": "\\d+ matches one or more consecutive digits, which captures '404' and '2'."
+        "correct_answer": "b",
+        "explanation": "\\b\\d{2,}\\b matches only multi-digit numbers (2 or more digits) that are complete words (404). Pattern A (\\d+) matches all digit sequences including single digits and those within words like '5' in '5x7'. Pattern C (\\b\\d\\b) matches only single-digit numbers that are complete words (2 and 9)."
     },
     {
         "id": 3,
-        "question": "Which regex pattern matches valid email addresses?",
-        "text": "Contact us at example@email.com or support@company.org",
+        "question": "Which regex pattern correctly matches ALL the valid email addresses in the text?",
+        "text": "Contact us at john.doe123@example.com, ADMIN@company.org or user-name@sub.domain.co.uk",
         "options": [
-            {"id": "a", "pattern": "\\w+@\\w+\\.\\w+"},
-            {"id": "b", "pattern": "[a-z]+@[a-z]+\\.[a-z]+"},
-            {"id": "c", "pattern": ".*@.*\\..*"}
+            {"id": "a", "pattern": "[a-zA-Z0-9.]+@[a-zA-Z0-9]+\\.[a-zA-Z]+", "hint": "Matches alphanumerics+dots in username, alphanumerics in domain, letters in TLD"},
+            {"id": "b", "pattern": "\\w+@\\w+\\.\\w+", "hint": "Matches word chars in username, domain, and TLD (no dots/hyphens except separators)"},
+            {"id": "c", "pattern": "[\\w.-]+@[\\w.-]+\\.[a-zA-Z.]{2,}", "hint": "Matches word chars+dots+hyphens in username/domain, letters+dots in TLD"}
         ],
-        "correct_answer": "a",
-        "explanation": "\\w+@\\w+\\.\\w+ matches one or more word characters, followed by @, more word characters, a period, and finally more word characters."
+        "correct_answer": "c",
+        "explanation": "Pattern C ([\\w.-]+@[\\w.-]+\\.[a-zA-Z.]{2,}) is the only one that correctly matches all three email addresses. Pattern A doesn't match hyphens in usernames or multi-part domains. Pattern B (\\w+@\\w+\\.\\w+) doesn't match dots or hyphens in usernames, and doesn't handle multi-part domains like sub.domain.co.uk."
     },
     {
         "id": 4,
-        "question": "Which regex pattern matches lines that start with 'Error:'?",
-        "text": "Error: File not found\nWarning: Low battery\nError: Connection lost",
+        "question": "Which regex pattern matches dates in the format MM/DD/YYYY?",
+        "text": "Meeting on 12/25/2023, deadline 2/3/2024, birthday on 07-14-1990, today is 2023/12/01",
         "options": [
-            {"id": "a", "pattern": "Error:"},
-            {"id": "b", "pattern": "^Error:"},
-            {"id": "c", "pattern": "Error:.*"}
+            {"id": "a", "pattern": "\\d{1,2}/\\d{1,2}/\\d{4}", "hint": "(1-2 digits)/(1-2 digits)/(4 digits)"},
+            {"id": "b", "pattern": "\\d{2}-\\d{2}-\\d{4}", "hint": "(2 digits)-(2 digits)-(4 digits)"},
+            {"id": "c", "pattern": "\\d{4}/\\d{2}/\\d{2}", "hint": "(4 digits)/(2 digits)/(2 digits)"}
         ],
-        "correct_answer": "b",
-        "explanation": "^Error: uses the ^ anchor to match 'Error:' only at the beginning of a line."
+        "correct_answer": "a",
+        "explanation": "\\d{1,2}/\\d{1,2}/\\d{4} matches dates in MM/DD/YYYY format like '12/25/2023' and '2/3/2024'. Pattern B matches dates with dashes like '07-14-1990'. Pattern C matches the reversed format YYYY/MM/DD like '2023/12/01'."
     }
 ]
 
@@ -286,6 +286,8 @@ def process_regex():
     test_text = data.get('text', '')
     flags = data.get('flags', '')
     
+    print(f"DEBUG - Received flags: '{flags}', pattern: '{pattern}', text: '{test_text}'")
+    
     if not pattern or not test_text:
         return jsonify({
             'valid': True,
@@ -300,8 +302,12 @@ def process_regex():
     flag_value = 0
     if 'i' in flags:
         flag_value |= re.IGNORECASE
+        print(f"DEBUG - Adding IGNORECASE flag")
     if 'm' in flags:
         flag_value |= re.MULTILINE
+        print(f"DEBUG - Adding MULTILINE flag")
+    
+    print(f"DEBUG - Final flag_value: {flag_value}")
     
     try:
         regex = re.compile(pattern, flag_value)

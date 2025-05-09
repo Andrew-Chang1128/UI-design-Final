@@ -52,6 +52,11 @@
                                     <span class="option-label">{{ option.id | upper }}.</span>
                                     <code class="ms-3 py-1 px-2 bg-dark text-white rounded">{{ option.pattern }}</code>
                                 </div>
+                                {% if option.hint %}
+                                <div class="mt-2">
+                                    <small class="text-muted">Hint: {{ option.hint }}</small>
+                                </div>
+                                {% endif %}
                                 <div class="mt-2 result-preview" id="result-{{ option.id }}"></div>
                             </label>
                         </div>
@@ -116,19 +121,8 @@
                         });
                     }
                     
-                    // Sort matches by index (from end to start to avoid position shifts)
-                    matches.sort((a, b) => b.index - a.index);
-                    
-                    // Apply highlighting
-                    matches.forEach(match => {
-                        const before = highlightedText.substring(0, match.index);
-                        const highlighted = `<span class="highlight">${highlightedText.substring(match.index, match.index + match.length)}</span>`;
-                        const after = highlightedText.substring(match.index + match.length);
-                        highlightedText = before + highlighted + after;
-                    });
-                    
-                    resultElement.innerHTML = `<small>Matches: ${matches.length}</small><br>
-                                              <small class="preview-text">${highlightedText || '<em>No matches found</em>'}</small>`;
+                    // Don't show any visual indication of matches
+                    resultElement.innerHTML = '';
                     
                 } catch (e) {
                     resultElement.innerHTML = `<small class="text-danger">Error: ${e.message}</small>`;
