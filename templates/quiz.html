@@ -37,6 +37,182 @@
                     <pre class="border p-3 bg-white">{{ question.text }}</pre>
                 </div>
                 
+                <!-- Drag and Drop Regex Builder Section -->
+                <div class="regex-builder mb-4">
+                    <h6 class="mb-3">Build a Regex Pattern:</h6>
+                    
+                    <div class="alert alert-info mb-3">
+                        <p><strong>Email Pattern Help:</strong> Build regex patterns by dragging tokens from the palette below into the drop area. This tool helps you experiment with different patterns to match email addresses.</p>
+                        <p class="mb-0 small">Tips: Click any token to remove it. Common email regex patterns include username, @ symbol, domain, and TLD components (e.g., [\w.-]+@[\w.-]+\.[a-zA-Z]{2,}).</p>
+                    </div>
+                    
+                    <!-- Token palette -->
+                    <div class="regex-tokens-container">
+                        <!-- Character Classes -->
+                        <div class="regex-token" data-type="character-class" data-value="\d">
+                            \d
+                            <span class="regex-token-tooltip">Matches any digit (0-9)</span>
+                        </div>
+                        <div class="regex-token" data-type="character-class" data-value="\w">
+                            \w
+                            <span class="regex-token-tooltip">Matches any word character (alphanumeric + underscore)</span>
+                        </div>
+                        <div class="regex-token" data-type="character-class" data-value="\s">
+                            \s
+                            <span class="regex-token-tooltip">Matches any whitespace character</span>
+                        </div>
+                        <div class="regex-token" data-type="character-class" data-value="[a-z]">
+                            [a-z]
+                            <span class="regex-token-tooltip">Matches any lowercase letter</span>
+                        </div>
+                        <div class="regex-token" data-type="character-class" data-value="[A-Z]">
+                            [A-Z]
+                            <span class="regex-token-tooltip">Matches any uppercase letter</span>
+                        </div>
+                        <div class="regex-token" data-type="character-class" data-value="[0-9]">
+                            [0-9]
+                            <span class="regex-token-tooltip">Matches any digit from 0 to 9</span>
+                        </div>
+                        
+                        <!-- Email-specific tokens -->
+                        <div class="regex-token" data-type="character-class" data-value="[a-zA-Z0-9]">
+                            [a-zA-Z0-9]
+                            <span class="regex-token-tooltip">Matches any alphanumeric character</span>
+                        </div>
+                        <div class="regex-token" data-type="character-class" data-value="[a-zA-Z]">
+                            [a-zA-Z]
+                            <span class="regex-token-tooltip">Matches any letter, uppercase or lowercase</span>
+                        </div>
+                        <div class="regex-token" data-type="character-class" data-value="[.-]">
+                            [.-]
+                            <span class="regex-token-tooltip">Matches a dot or hyphen</span>
+                        </div>
+                        <div class="regex-token" data-type="character-class" data-value="[\w.-]">
+                            [\w.-]
+                            <span class="regex-token-tooltip">Matches word chars, dots, or hyphens</span>
+                        </div>
+                        <div class="regex-token" data-type="special" data-value="@">
+                            @
+                            <span class="regex-token-tooltip">Email separator symbol</span>
+                        </div>
+                        <div class="regex-token" data-type="special" data-value=".">
+                            .
+                            <span class="regex-token-tooltip">Matches any character except newline (or a literal dot in some contexts)</span>
+                        </div>
+                        <div class="regex-token" data-type="special" data-value="\.">
+                            \.
+                            <span class="regex-token-tooltip">Matches a literal dot character</span>
+                        </div>
+                        <div class="regex-token" data-type="special" data-value="-">
+                            -
+                            <span class="regex-token-tooltip">Hyphen character</span>
+                        </div>
+                        
+                        <!-- Email-specific additions -->
+                        <div class="regex-token" data-type="character-class" data-value="[a-zA-Z0-9.-]">
+                            [a-zA-Z0-9.-]
+                            <span class="regex-token-tooltip">Matches alphanumeric chars, dots, or hyphens (common in email usernames)</span>
+                        </div>
+                        <div class="regex-token" data-type="character-class" data-value="[a-zA-Z0-9_-]">
+                            [a-zA-Z0-9_-]
+                            <span class="regex-token-tooltip">Matches alphanumeric chars, underscore, or hyphen</span>
+                        </div>
+                        <div class="regex-token" data-type="character-class" data-value="[a-zA-Z.]{2,}">
+                            [a-zA-Z.]{2,}
+                            <span class="regex-token-tooltip">Matches 2+ letters or dots (for TLDs like .co.uk)</span>
+                        </div>
+                        
+                        <!-- Quantifiers -->
+                        <div class="regex-token" data-type="quantifier" data-value="*">
+                            *
+                            <span class="regex-token-tooltip">Matches 0 or more of the preceding character/group</span>
+                        </div>
+                        <div class="regex-token" data-type="quantifier" data-value="+">
+                            +
+                            <span class="regex-token-tooltip">Matches 1 or more of the preceding character/group</span>
+                        </div>
+                        <div class="regex-token" data-type="quantifier" data-value="?">
+                            ?
+                            <span class="regex-token-tooltip">Matches 0 or 1 of the preceding character/group</span>
+                        </div>
+                        <div class="regex-token" data-type="quantifier" data-value="{1}">
+                            {1}
+                            <span class="regex-token-tooltip">Matches exactly 1 occurrence</span>
+                        </div>
+                        <div class="regex-token" data-type="quantifier" data-value="{2,}">
+                            {2,}
+                            <span class="regex-token-tooltip">Matches 2 or more occurrences</span>
+                        </div>
+                        <div class="regex-token" data-type="quantifier" data-value="{1,3}">
+                            {1,3}
+                            <span class="regex-token-tooltip">Matches between 1 and 3 occurrences</span>
+                        </div>
+                        <div class="regex-token" data-type="quantifier" data-value="{1,2}">
+                            {1,2}
+                            <span class="regex-token-tooltip">Matches between 1 and 2 occurrences (for date formats)</span>
+                        </div>
+                        <div class="regex-token" data-type="quantifier" data-value="{4}">
+                            {4}
+                            <span class="regex-token-tooltip">Matches exactly 4 occurrences (for year format)</span>
+                        </div>
+                        
+                        <!-- Anchors -->
+                        <div class="regex-token" data-type="anchor" data-value="^">
+                            ^
+                            <span class="regex-token-tooltip">Matches the beginning of a string</span>
+                        </div>
+                        <div class="regex-token" data-type="anchor" data-value="$">
+                            $
+                            <span class="regex-token-tooltip">Matches the end of a string</span>
+                        </div>
+                        <div class="regex-token" data-type="anchor" data-value="\b">
+                            \b
+                            <span class="regex-token-tooltip">Matches a word boundary</span>
+                        </div>
+                        
+                        <!-- Groups & Special -->
+                        <div class="regex-token" data-type="group" data-value="(...)">
+                            (...)
+                            <span class="regex-token-tooltip">Capturing group</span>
+                        </div>
+                        <div class="regex-token" data-type="group" data-value="(?:...)">
+                            (?:...)
+                            <span class="regex-token-tooltip">Non-capturing group</span>
+                        </div>
+                        <div class="regex-token" data-type="special" data-value="|">
+                            |
+                            <span class="regex-token-tooltip">Alternation (OR operator)</span>
+                        </div>
+                        <div class="regex-token" data-type="special" data-value="[^...]">
+                            [^...]
+                            <span class="regex-token-tooltip">Negated character class - matches anything NOT in the brackets</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Build area -->
+                    <label class="form-label">Drop regex tokens here to build your pattern:</label>
+                    <div class="regex-builder-container">
+                        <div class="regex-dropzone" id="regex-dropzone"></div>
+                    </div>
+                    
+                    <!-- Regex output -->
+                    <label class="form-label">Your regex pattern:</label>
+                    <div class="regex-builder-output" id="regex-output">/^$/</div>
+                    
+                    <!-- Controls -->
+                    <div class="regex-builder-controls">
+                        <button type="button" class="btn regex-clear-btn" id="regex-clear-btn">Clear</button>
+                        <button type="button" class="btn regex-test-btn" id="regex-test-btn">Test Pattern</button>
+                    </div>
+                    
+                    <!-- Results Area -->
+                    <div class="regex-result-container" id="regex-result-container" style="display: none;">
+                        <h6>Matches:</h6>
+                        <div id="regex-result"></div>
+                        <div id="regex-match-count" class="badge bg-secondary mt-2"></div>
+                    </div>
+                </div>
+                
                 <form action="{{ url_for('quiz', question_id=next_id if has_next else 1) }}" method="post" id="quiz-form">
                     <input type="hidden" name="prev_question_id" value="{{ question.id }}">
                     
@@ -100,6 +276,7 @@
                 {% endfor %}
             ];
             
+            // Regular quiz options functionality
             options.forEach(option => {
                 const resultElement = document.getElementById(`result-${option.id}`);
                 
@@ -158,6 +335,332 @@
                 });
             });
             {% endif %}
+            
+            // ======= Drag and Drop Regex Builder Functionality =======
+            const regexTokens = document.querySelectorAll('.regex-token');
+            const dropZone = document.getElementById('regex-dropzone');
+            const outputDisplay = document.getElementById('regex-output');
+            const clearBtn = document.getElementById('regex-clear-btn');
+            const testBtn = document.getElementById('regex-test-btn');
+            const resultContainer = document.getElementById('regex-result-container');
+            const resultDisplay = document.getElementById('regex-result');
+            const matchCountDisplay = document.getElementById('regex-match-count');
+            
+            let draggedToken = null;
+            let dragClone = null;
+            let offsetX, offsetY;
+            
+            // Initialize for touch devices
+            let touchDevice = false;
+            if ('ontouchstart' in window || navigator.maxTouchPoints) {
+                touchDevice = true;
+            }
+            
+            // Helper function to escape HTML
+            function escapeHTML(text) {
+                return text
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#039;');
+            }
+            
+            // Helper function to update the regex output
+            function updateRegexOutput() {
+                let pattern = '';
+                
+                // Collect all tokens in the dropzone
+                const tokens = dropZone.querySelectorAll('.regex-token');
+                tokens.forEach(token => {
+                    let value = token.getAttribute('data-value');
+                    
+                    // Handle special cases
+                    if (value === '(...)') {
+                        value = '()'; // Default empty group
+                    } else if (value === '(?:...)') {
+                        value = '(?:)'; // Default empty non-capturing group
+                    } else if (value === '[^...]') {
+                        value = '[^]'; // Default empty negated class
+                    }
+                    
+                    pattern += value;
+                });
+                
+                // If empty, show default empty pattern
+                if (!pattern) {
+                    pattern = '^$';
+                }
+                
+                outputDisplay.textContent = '/' + pattern + '/';
+                return pattern;
+            }
+            
+            // Add drag listeners to tokens
+            regexTokens.forEach(token => {
+                // Make copies of the tokens draggable
+                token.addEventListener('mousedown', handleDragStart);
+                token.addEventListener('touchstart', handleTouchStart, { passive: false });
+                
+                // Show tooltip on hover
+                token.addEventListener('mouseenter', function() {
+                    const tooltip = this.querySelector('.regex-token-tooltip');
+                    if (tooltip) tooltip.style.opacity = '1';
+                });
+                
+                token.addEventListener('mouseleave', function() {
+                    const tooltip = this.querySelector('.regex-token-tooltip');
+                    if (tooltip) tooltip.style.opacity = '0';
+                });
+            });
+            
+            // Drag and drop handlers
+            function handleDragStart(e) {
+                if (touchDevice) return; // Skip for touch devices
+                
+                draggedToken = this;
+                
+                // Create a clone for dragging
+                dragClone = draggedToken.cloneNode(true);
+                dragClone.classList.add('drag-clone');
+                document.body.appendChild(dragClone);
+                
+                // Calculate offset for centering
+                const rect = draggedToken.getBoundingClientRect();
+                offsetX = e.clientX - rect.left - (rect.width / 2);
+                offsetY = e.clientY - rect.top - (rect.height / 2);
+                
+                // Position the clone
+                updateDragPosition(e.clientX, e.clientY);
+                
+                // Add mouse move and up listeners
+                document.addEventListener('mousemove', handleDrag);
+                document.addEventListener('mouseup', handleDrop);
+                
+                e.preventDefault();
+            }
+            
+            function handleTouchStart(e) {
+                if (!touchDevice) return;
+                
+                draggedToken = this;
+                
+                // Create a clone for dragging
+                dragClone = draggedToken.cloneNode(true);
+                dragClone.classList.add('drag-clone');
+                document.body.appendChild(dragClone);
+                
+                // Calculate offset for centering (use first touch)
+                const touch = e.touches[0];
+                const rect = draggedToken.getBoundingClientRect();
+                offsetX = touch.clientX - rect.left - (rect.width / 2);
+                offsetY = touch.clientY - rect.top - (rect.height / 2);
+                
+                // Position the clone
+                updateDragPosition(touch.clientX, touch.clientY);
+                
+                // Add touch move and end listeners
+                document.addEventListener('touchmove', handleTouchMove, { passive: false });
+                document.addEventListener('touchend', handleTouchEnd);
+                
+                e.preventDefault();
+            }
+            
+            function handleDrag(e) {
+                updateDragPosition(e.clientX, e.clientY);
+                e.preventDefault();
+                
+                // Check if over dropzone
+                const dropRect = dropZone.getBoundingClientRect();
+                if (e.clientX >= dropRect.left && 
+                    e.clientX <= dropRect.right && 
+                    e.clientY >= dropRect.top && 
+                    e.clientY <= dropRect.bottom) {
+                    dropZone.classList.add('drag-over');
+                } else {
+                    dropZone.classList.remove('drag-over');
+                }
+            }
+            
+            function handleTouchMove(e) {
+                const touch = e.touches[0];
+                updateDragPosition(touch.clientX, touch.clientY);
+                e.preventDefault();
+                
+                // Check if over dropzone
+                const dropRect = dropZone.getBoundingClientRect();
+                if (touch.clientX >= dropRect.left && 
+                    touch.clientX <= dropRect.right && 
+                    touch.clientY >= dropRect.top && 
+                    touch.clientY <= dropRect.bottom) {
+                    dropZone.classList.add('drag-over');
+                } else {
+                    dropZone.classList.remove('drag-over');
+                }
+            }
+            
+            function updateDragPosition(x, y) {
+                if (!dragClone) return;
+                
+                dragClone.style.left = (x - offsetX) + 'px';
+                dragClone.style.top = (y - offsetY) + 'px';
+            }
+            
+            function handleDrop(e) {
+                document.removeEventListener('mousemove', handleDrag);
+                document.removeEventListener('mouseup', handleDrop);
+                
+                const dropRect = dropZone.getBoundingClientRect();
+                if (e.clientX >= dropRect.left && 
+                    e.clientX <= dropRect.right && 
+                    e.clientY >= dropRect.top && 
+                    e.clientY <= dropRect.bottom) {
+                    // Add token to dropzone
+                    addTokenToDropzone(draggedToken);
+                }
+                
+                cleanupDrag();
+                e.preventDefault();
+            }
+            
+            function handleTouchEnd(e) {
+                document.removeEventListener('touchmove', handleTouchMove);
+                document.removeEventListener('touchend', handleTouchEnd);
+                
+                // Get the last touch position
+                const lastTouch = e.changedTouches[0];
+                
+                const dropRect = dropZone.getBoundingClientRect();
+                if (lastTouch.clientX >= dropRect.left && 
+                    lastTouch.clientX <= dropRect.right && 
+                    lastTouch.clientY >= dropRect.top && 
+                    lastTouch.clientY <= dropRect.bottom) {
+                    // Add token to dropzone
+                    addTokenToDropzone(draggedToken);
+                }
+                
+                cleanupDrag();
+                e.preventDefault();
+            }
+            
+            function cleanupDrag() {
+                dropZone.classList.remove('drag-over');
+                if (dragClone && dragClone.parentNode) {
+                    dragClone.parentNode.removeChild(dragClone);
+                }
+                dragClone = null;
+                draggedToken = null;
+            }
+            
+            function addTokenToDropzone(sourceToken) {
+                // Create a new token copy for the dropzone
+                const newToken = document.createElement('div');
+                newToken.className = sourceToken.className;
+                newToken.textContent = sourceToken.firstChild.textContent.trim();
+                newToken.setAttribute('data-type', sourceToken.getAttribute('data-type'));
+                newToken.setAttribute('data-value', sourceToken.getAttribute('data-value'));
+                
+                // Add tooltip
+                const tooltip = document.createElement('span');
+                tooltip.className = 'regex-token-tooltip';
+                tooltip.textContent = sourceToken.querySelector('.regex-token-tooltip').textContent;
+                newToken.appendChild(tooltip);
+                
+                // Add delete functionality
+                newToken.addEventListener('click', function() {
+                    this.parentNode.removeChild(this);
+                    updateRegexOutput();
+                    hideResult();
+                });
+                
+                // Add to dropzone
+                dropZone.appendChild(newToken);
+                
+                // Update the regex output
+                updateRegexOutput();
+                
+                // Hide the result when pattern changes
+                hideResult();
+            }
+            
+            // Test button click handler
+            testBtn.addEventListener('click', function() {
+                const pattern = updateRegexOutput();
+                
+                try {
+                    // Create regex object with proper escaping for email regex patterns
+                    // Handle special cases for email pattern testing
+                    let processedPattern = pattern;
+                    
+                    // For email patterns, ensure we process backslashes and special characters correctly
+                    if (pattern.includes('@') || pattern.includes('\\')) {
+                        processedPattern = pattern.replace(/\\([dws])/g, '\\$1')
+                                               .replace(/\\\./g, '\\.');
+                    }
+                    
+                    const regex = new RegExp(processedPattern, 'g');
+                    
+                    // Find matches
+                    let match;
+                    let highlightedText = testText;
+                    let matches = [];
+                    
+                    while ((match = regex.exec(testText)) !== null) {
+                        matches.push({
+                            text: match[0],
+                            index: match.index,
+                            length: match[0].length
+                        });
+                    }
+                    
+                    // Sort matches by index (from end to start to avoid position shifts)
+                    matches.sort((a, b) => b.index - a.index);
+                    
+                    // Apply highlighting
+                    matches.forEach(match => {
+                        const before = highlightedText.substring(0, match.index);
+                        const highlighted = `<span class="highlight">${escapeHTML(highlightedText.substring(match.index, match.index + match.length))}</span>`;
+                        const after = highlightedText.substring(match.index + match.length);
+                        highlightedText = before + highlighted + after;
+                    });
+                    
+                    // Show the results
+                    resultContainer.style.display = 'block';
+                    resultDisplay.innerHTML = highlightedText || '<em>No matches found</em>';
+                    matchCountDisplay.textContent = `${matches.length} ${matches.length === 1 ? 'match' : 'matches'}`;
+                    
+                    // Check for potential email matching case
+                    if (testText.includes('@') && pattern.indexOf('@') === -1) {
+                        resultDisplay.innerHTML += '<div class="alert alert-warning mt-2">Tip: Email patterns typically include the @ symbol. Your pattern doesn\'t have one.</div>';
+                    }
+                    
+                } catch (e) {
+                    resultContainer.style.display = 'block';
+                    resultDisplay.innerHTML = `<p class="text-danger">Error: ${e.message}</p>`;
+                    matchCountDisplay.textContent = '0 matches';
+                }
+            });
+            
+            // Clear button click handler
+            clearBtn.addEventListener('click', function() {
+                // Clear all tokens from the dropzone
+                while (dropZone.firstChild) {
+                    dropZone.removeChild(dropZone.firstChild);
+                }
+                
+                // Update the regex output
+                updateRegexOutput();
+                
+                // Hide the result
+                hideResult();
+            });
+            
+            function hideResult() {
+                resultContainer.style.display = 'none';
+            }
+            
+            // Initial regex output
+            updateRegexOutput();
         });
     </script>
 </body>

@@ -454,4 +454,193 @@ code {
     z-index: 2;
     color: #212529;
     font-family: monospace;
+}
+
+/* Drag and Drop Regex Builder */
+.regex-builder {
+    margin-bottom: 2rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 1.5rem;
+    background-color: #f8fafc;
+}
+
+.regex-tokens-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    border: 1px dashed #cbd5e0;
+    border-radius: 4px;
+    background-color: #edf2f7;
+}
+
+.regex-token {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    height: 40px;
+    padding: 0.25rem 0.75rem;
+    background-color: #fff;
+    border: 2px solid #4a90e2;
+    border-radius: 4px;
+    font-family: monospace;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: move;
+    user-select: none;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.regex-token:hover {
+    background-color: #ebf8ff;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.regex-token[data-type="character-class"] {
+    border-color: #38a169;
+    background-color: #f0fff4;
+}
+
+.regex-token[data-type="quantifier"] {
+    border-color: #d69e2e;
+    background-color: #fffff0;
+}
+
+.regex-token[data-type="anchor"] {
+    border-color: #3182ce;
+    background-color: #ebf8ff;
+}
+
+.regex-token[data-type="group"] {
+    border-color: #e53e3e;
+    background-color: #fff5f5;
+}
+
+.regex-token[data-type="special"] {
+    border-color: #805ad5;
+    background-color: #faf5ff;
+}
+
+.regex-token-tooltip {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-bottom: 8px;
+    padding: 0.5rem;
+    background-color: #2d3748;
+    color: white;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    z-index: 100;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-weight: normal;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    max-width: 300px;
+}
+
+.regex-token-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #2d3748 transparent transparent transparent;
+}
+
+.regex-token:hover .regex-token-tooltip {
+    opacity: 1;
+}
+
+.regex-builder-container {
+    display: flex;
+    align-items: center;
+    background-color: white;
+    border: 2px solid #4a5568;
+    border-radius: 4px;
+    padding: 0.5rem;
+    min-height: 60px;
+    margin-bottom: 1rem;
+}
+
+.regex-dropzone {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    min-height: 40px;
+}
+
+.regex-dropzone.drag-over {
+    background-color: rgba(74, 144, 226, 0.1);
+}
+
+.regex-builder-output {
+    font-family: monospace;
+    margin-top: 1rem;
+    padding: 0.75rem;
+    background-color: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    font-size: 1.1rem;
+}
+
+.regex-builder-controls {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1rem;
+}
+
+.regex-clear-btn {
+    background-color: #f7fafc;
+    border: 1px solid #e2e8f0;
+    color: #4a5568;
+}
+
+.regex-test-btn {
+    background-color: #4299e1;
+    color: white;
+}
+
+.regex-result-container {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    background-color: white;
+}
+
+/* Clone styles for drag operation */
+.regex-token.dragging {
+    opacity: 0.5;
+}
+
+.regex-token.drag-clone {
+    position: absolute;
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0.8;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Quiz regex builder result highlight styles */
+#regex-result .highlight {
+    background-color: rgba(246, 173, 85, 0.3);
+    border: 1px solid rgba(246, 173, 85, 0.6);
+    padding: 2px 4px;
+    margin: 0 1px;
+    border-radius: 3px;
+    color: #d35400;
 } 
