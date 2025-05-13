@@ -21,6 +21,30 @@
     </header>
     
     <div class="container my-5">
+        <!-- Challenge Section -->
+        <div class="card shadow-sm mb-4" id="challenge-section">
+            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                <h2>Regex Challenge</h2>
+                <button id="new-challenge-btn" class="btn btn-primary btn-sm">New Challenge</button>
+            </div>
+            <div class="card-body">
+                <div class="challenge-prompt mb-3">
+                    <h4 id="challenge-title">Can you write a regex to match all valid email addresses in the text?</h4>
+                    <p id="challenge-description" class="text-muted">Try to create a pattern that matches all email addresses but doesn't match invalid ones.</p>
+                </div>
+                
+                <div id="challenge-feedback" class="alert alert-info" role="alert">
+                    Start working on the challenge! Your pattern should match all valid items in the test text.
+                </div>
+                
+                <div class="text-end mb-3">
+                    <button id="check-solution-btn" class="btn btn-success">Check Solution</button>
+                    <button id="show-solution-btn" class="btn btn-outline-secondary ms-2">Show Solution</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Playground Section -->
         <div class="card shadow-sm mb-4">
             <div class="card-header bg-light">
                 <h2>Test Your Regular Expressions</h2>
@@ -88,5 +112,194 @@
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    
+    <!-- Challenge functionality script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM elements
+            const newChallengeBtn = document.getElementById('new-challenge-btn');
+            const challengeTitle = document.getElementById('challenge-title');
+            const challengeDescription = document.getElementById('challenge-description');
+            const challengeFeedback = document.getElementById('challenge-feedback');
+            const checkSolutionBtn = document.getElementById('check-solution-btn');
+            const showSolutionBtn = document.getElementById('show-solution-btn');
+            const regexInput = document.getElementById('regex-input');
+            const testInput = document.getElementById('test-input');
+            const flagG = document.getElementById('flag-g');
+            const flagI = document.getElementById('flag-i');
+            const flagM = document.getElementById('flag-m');
+            
+            let currentChallenge = null;
+            
+            // Function to check the user's solution
+            function checkSolution() {
+                if (!currentChallenge) return;
+                
+                const pattern = regexInput.value;
+                if (!pattern) {
+                    challengeFeedback.className = 'alert alert-warning';
+                    challengeFeedback.textContent = 'Please enter a regex pattern first!';
+                    return;
+                }
+                
+                try {
+                    // Build flags string
+                    let flags = '';
+                    if (flagG.checked) flags += 'g';
+                    if (flagI.checked) flags += 'i';
+                    if (flagM.checked) flags += 'm';
+                    
+                    // Make a request to the backend for verification
+                    fetch('/api/verify-challenge', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            challenge_id: currentChallenge.id,
+                            pattern: pattern,
+                            flags: flags
+                        }),
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Server error');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (!data.valid) {
+                            // Invalid regex pattern
+                            challengeFeedback.className = 'alert alert-danger';
+                            challengeFeedback.textContent = `Error: ${data.error}. Your regex pattern is invalid.`;
+                            return;
+                        }
+                        
+                        // Process the results
+                        const missing = data.missing;
+                        const extra = data.extra;
+                        
+                        if (data.perfect_match) {
+                            // Perfect match!
+                            challengeFeedback.className = 'alert alert-success';
+                            challengeFeedback.innerHTML = '<strong>Perfect!</strong> Your regex pattern matches exactly what we were looking for. Great job!';
+                        } else if (missing.length === 0 && extra.length > 0) {
+                            // Matches all expected but also extra items
+                            challengeFeedback.className = 'alert alert-warning';
+                            challengeFeedback.innerHTML = `<strong>Almost there!</strong> Your pattern correctly matches all ${data.expected.length} expected items, but also matches ${extra.length} additional items that shouldn't be matched.`;
+                            
+                            // Show detailed match info
+                            if (extra.length <= 3) {
+                                challengeFeedback.innerHTML += `<div class="mt-2"><strong>Extra matches:</strong> ${extra.map(m => `<span class="solution-badge extra-match">${m}</span>`).join(' ')}</div>`;
+                            }
+                        } else if (missing.length > 0 && extra.length === 0) {
+                            // Missing some expected matches
+                            challengeFeedback.className = 'alert alert-warning';
+                            challengeFeedback.innerHTML = `<strong>Getting closer!</strong> Your pattern matches some items correctly, but is missing ${missing.length} out of ${data.expected.length} expected matches.`;
+                            
+                            // Show detailed match info
+                            if (missing.length <= 3) {
+                                challengeFeedback.innerHTML += `<div class="mt-2"><strong>Missing matches:</strong> ${missing.map(m => `<span class="solution-badge missing-match">${m}</span>`).join(' ')}</div>`;
+                            }
+                        } else {
+                            // Both missing and has extras
+                            challengeFeedback.className = 'alert alert-warning';
+                            challengeFeedback.innerHTML = `<strong>Not quite right.</strong> Your pattern is missing ${missing.length} expected matches and incorrectly matches ${extra.length} additional items.`;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        challengeFeedback.className = 'alert alert-danger';
+                        challengeFeedback.textContent = `Error: ${error.message}. Please try again.`;
+                    });
+                    
+                } catch (error) {
+                    // Invalid regex pattern
+                    challengeFeedback.className = 'alert alert-danger';
+                    challengeFeedback.textContent = `Error: ${error.message}. Your regex pattern is invalid.`;
+                }
+            }
+            
+            // Function to show the solution
+            function showSolution() {
+                if (!currentChallenge) return;
+                
+                // Fetch the solution from the server
+                fetch(`/api/challenges?id=${currentChallenge.id}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        challengeFeedback.className = 'alert alert-danger';
+                        challengeFeedback.textContent = `Error: ${data.error}`;
+                        return;
+                    }
+                    
+                    // Display the solution pattern
+                    regexInput.value = data.solution;
+                    
+                    // Trigger input event to update the display
+                    const event = new Event('input', { bubbles: true });
+                    regexInput.dispatchEvent(event);
+                    
+                    // Update feedback
+                    challengeFeedback.className = 'alert alert-info';
+                    challengeFeedback.innerHTML = `<strong>Solution shown:</strong> This is one possible solution. There might be other valid patterns that also work!`;
+                    
+                    // Check the solution to show the matches
+                    checkSolution();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    challengeFeedback.className = 'alert alert-danger';
+                    challengeFeedback.textContent = `Error fetching solution: ${error.message}`;
+                });
+            }
+            
+            // Function to get random challenge from server
+            function setRandomChallenge() {
+                fetch('/api/challenges')
+                .then(response => response.json())
+                .then(challenges => {
+                    if (!challenges || challenges.length === 0) {
+                        challengeFeedback.className = 'alert alert-danger';
+                        challengeFeedback.textContent = 'No challenges available';
+                        return;
+                    }
+                    
+                    const randomIndex = Math.floor(Math.random() * challenges.length);
+                    const challenge = challenges[randomIndex];
+                    
+                    currentChallenge = challenge;
+                    challengeTitle.textContent = challenge.title;
+                    challengeDescription.textContent = challenge.description;
+                    testInput.value = challenge.test_text;
+                    
+                    // Reset feedback
+                    challengeFeedback.className = 'alert alert-info';
+                    challengeFeedback.textContent = 'Start working on the challenge! Your pattern should match all valid items in the test text.';
+                    
+                    // Clear the regex input
+                    regexInput.value = '';
+                    
+                    // Trigger the test input event to update the display
+                    const event = new Event('input', { bubbles: true });
+                    testInput.dispatchEvent(event);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    challengeFeedback.className = 'alert alert-danger';
+                    challengeFeedback.textContent = `Error loading challenges: ${error.message}`;
+                });
+            }
+            
+            // Event listeners
+            newChallengeBtn.addEventListener('click', setRandomChallenge);
+            checkSolutionBtn.addEventListener('click', checkSolution);
+            showSolutionBtn.addEventListener('click', showSolution);
+            
+            // Initialize with a random challenge
+            setRandomChallenge();
+        });
+    </script>
 </body>
 </html> 

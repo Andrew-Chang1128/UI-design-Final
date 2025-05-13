@@ -152,6 +152,50 @@ QUIZ_QUESTIONS = [
     }
 ]
 
+# Regex Challenge data
+REGEX_CHALLENGES = [
+    {
+        "id": 1,
+        "title": "Match all valid email addresses",
+        "description": "Create a pattern that matches standard email addresses with various domains and username formats.",
+        "test_text": "Contact us at john.doe@example.com, ADMIN@company.org or user-name@sub.domain.co.uk\nInvalid entries: john@, @domain.com, plaintext, john@domain.",
+        "expected_matches": ["john.doe@example.com", "ADMIN@company.org", "user-name@sub.domain.co.uk"],
+        "solution": "[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,}"
+    },
+    {
+        "id": 2,
+        "title": "Match US phone numbers in the format (XXX) XXX-XXXX",
+        "description": "Find all phone numbers that follow the standard US format with area code in parentheses.",
+        "test_text": "Call me at (123) 456-7890 or (555) 123-4567.\nDon't call 123-456-7890 or (123)456-7890 as these formats aren't what we're looking for.",
+        "expected_matches": ["(123) 456-7890", "(555) 123-4567"],
+        "solution": "\\(\\d{3}\\) \\d{3}-\\d{4}"
+    },
+    {
+        "id": 3,
+        "title": "Match dates in MM/DD/YYYY format",
+        "description": "Find all dates that follow the MM/DD/YYYY format, including single-digit months and days.",
+        "test_text": "Meeting on 12/25/2023, deadline 2/3/2024, birthday on 07-14-1990, today is 2023/12/01",
+        "expected_matches": ["12/25/2023", "2/3/2024"],
+        "solution": "\\d{1,2}/\\d{1,2}/\\d{4}"
+    },
+    {
+        "id": 4,
+        "title": "Match all HTML tags",
+        "description": "Find all HTML tags (opening and closing) in the text.",
+        "test_text": "<div>This is a <p>paragraph</p> with <a href=\"https://example.com\">link</a> inside a div</div>\nNot tags: < hello > or <invalid",
+        "expected_matches": ["<div>", "<p>", "</p>", "<a href=\"https://example.com\">", "</a>", "</div>"],
+        "solution": "<[^>]+>"
+    },
+    {
+        "id": 5,
+        "title": "Match URLs beginning with http or https",
+        "description": "Find all valid web URLs that start with http:// or https://",
+        "test_text": "Visit https://www.example.com or http://subdomain.example.org/page\nNot matching: www.example.com or ftp://files.example.net",
+        "expected_matches": ["https://www.example.com", "http://subdomain.example.org/page"],
+        "solution": "https?://[\\w.-]+\\.[a-zA-Z]{2,}(?:/[\\w./?=%&-]*)?"
+    }
+]
+
 # Initialize user session data
 def init_user_session():
     if 'user_data' not in session:
@@ -624,6 +668,93 @@ def explain_pattern(pattern):
             i += 1
     
     return components
+
+@app.route('/api/challenges', methods=['GET'])
+def get_challenges():
+    """Return all challenge data or a specific challenge by ID"""
+    challenge_id = request.args.get('id')
+    
+    if challenge_id:
+        try:
+            challenge_id = int(challenge_id)
+            for challenge in REGEX_CHALLENGES:
+                if challenge['id'] == challenge_id:
+                    return jsonify(challenge)
+            return jsonify({"error": "Challenge not found"}), 404
+        except ValueError:
+            return jsonify({"error": "Invalid challenge ID"}), 400
+    
+    # Return all challenges but without solutions
+    challenges_without_solutions = []
+    for challenge in REGEX_CHALLENGES:
+        challenge_copy = challenge.copy()
+        if 'solution' in challenge_copy:
+            del challenge_copy['solution']
+        challenges_without_solutions.append(challenge_copy)
+    
+    return jsonify(challenges_without_solutions)
+
+@app.route('/api/verify-challenge', methods=['POST'])
+def verify_challenge():
+    """Verify a user's regex solution against a challenge"""
+    data = request.json
+    
+    if not data:
+        return jsonify({"error": "No data provided"}), 400
+    
+    challenge_id = data.get('challenge_id')
+    pattern = data.get('pattern')
+    flags = data.get('flags', '')
+    
+    if not challenge_id or not pattern:
+        return jsonify({"error": "Missing required parameters"}), 400
+    
+    # Find the challenge
+    challenge = None
+    for c in REGEX_CHALLENGES:
+        if c['id'] == challenge_id:
+            challenge = c
+            break
+    
+    if not challenge:
+        return jsonify({"error": "Challenge not found"}), 404
+    
+    # Convert flags to Python re flags
+    flag_value = 0
+    if 'i' in flags:
+        flag_value |= re.IGNORECASE
+    if 'm' in flags:
+        flag_value |= re.MULTILINE
+    
+    try:
+        # Compile the regex
+        regex = re.compile(pattern, flag_value)
+        
+        # Find all matches
+        test_text = challenge['test_text']
+        matches = [match.group(0) for match in regex.finditer(test_text)]
+        
+        # Compare with expected matches
+        expected = challenge['expected_matches']
+        missing = [exp for exp in expected if exp not in matches]
+        extra = [mat for mat in matches if mat not in expected]
+        
+        result = {
+            'valid': True,
+            'matches': matches,
+            'expected': expected,
+            'missing': missing,
+            'extra': extra,
+            'perfect_match': len(missing) == 0 and len(extra) == 0
+        }
+        
+        return jsonify(result)
+        
+    except re.error as e:
+        return jsonify({
+            'valid': False,
+            'error': str(e)
+        })
 
 if __name__ == '__main__':
     # app.run(debug=True, host='0.0.0.0', port=5001) 
